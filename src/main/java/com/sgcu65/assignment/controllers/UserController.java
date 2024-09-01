@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sgcu65.assignment.domain.User;
+import com.sgcu65.assignment.dto.ChangePasswordDto;
 import com.sgcu65.assignment.message.JsonFieldName;
 import com.sgcu65.assignment.service.JwtService;
 import com.sgcu65.assignment.service.UserService;
@@ -78,5 +80,19 @@ public class UserController {
 		return ResponseEntity.status((int) map.get(JsonFieldName.CODE)).body(map);
 	}
 	
+	@PatchMapping(value = "/api/v1/users")
+	public ResponseEntity<Map<String,Object>> changePassword(@RequestHeader("Authorization") String bearerToken,@RequestBody ChangePasswordDto dto){
+		final String jwt = bearerToken.substring(7);
+		String loginUser = jwtService.extractUsername(jwt);
+		Map<String, Object> map = userService.changePassword(dto, loginUser);
+		return ResponseEntity.status((int) map.get(JsonFieldName.CODE)).body(map);
+	}
+	@GetMapping(value = "/api/v1/users/me")
+	public ResponseEntity<Map<String,Object>> me(@RequestHeader("Authorization") String bearerToken){
+		final String jwt = bearerToken.substring(7);
+		String loginUser = jwtService.extractUsername(jwt);
+		Map<String,Object> map = userService.me(loginUser);
+		return ResponseEntity.status((int) map.get(JsonFieldName.CODE)).body(map);
+	}
 
 }

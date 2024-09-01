@@ -25,5 +25,11 @@ public final class ErrorMessage {
 	public static final String NAME_IS_REQUIRED = "name is required";
 	
 	public static final String TEAM_IS_NOT_EXIST = "Team is not exists";
-			
+	
+	public static final String OLD_PASSWORD_IS_REQUIRED = "Old Password is required";
+	public static final String NEW_PASSWORD_IS_REQUIRED = "New Password is required";
+	
+	public static final String OLD_PASSWORD_IS_NOT_EQUAL_NEW_PASSWORD = "Old password must not equal new password";
+	
+	public static final String PASSWORD_NOT_MATCH = "Password not match";
 }

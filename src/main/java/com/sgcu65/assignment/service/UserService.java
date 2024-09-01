@@ -9,10 +9,12 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sgcu65.assignment.domain.Role;
 import com.sgcu65.assignment.domain.User;
+import com.sgcu65.assignment.dto.ChangePasswordDto;
 import com.sgcu65.assignment.message.ErrorMessage;
 import com.sgcu65.assignment.message.JsonFieldName;
 import com.sgcu65.assignment.repository.IUserRepository;
@@ -23,6 +25,9 @@ public class UserService {
 
 	@Autowired
 	private IUserRepository userRepository;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	public Map<String, Object> findAll(String firstName, String surName, String position, String salary,
 			String loginUser) {
@@ -241,6 +246,68 @@ public class UserService {
 			return map;
 
 		} catch (Exception ex) {
+			map.put(JsonFieldName.CODE, HttpStatus.INTERNAL_SERVER_ERROR.value());
+			map.put(JsonFieldName.ERROR, ex.getMessage());
+			return map;
+		}
+	}
+	public Map<String,Object> changePassword(ChangePasswordDto dto ,String loginUser){
+		Map<String, Object> map = new HashMap<>();
+		try {
+
+			List<String> errors = new ArrayList<>();
+			if(dto.getOldPassword()==null || dto.getOldPassword().isEmpty()|| dto.getOldPassword().equals("")) {
+				errors.add(ErrorMessage.OLD_PASSWORD_IS_REQUIRED);
+			}
+			if(dto.getNewPassword()==null || dto.getNewPassword().isEmpty()|| dto.getNewPassword().equals("")) {
+				errors.add(ErrorMessage.NEW_PASSWORD_IS_REQUIRED);
+			}
+			if(errors.size()>0) {
+				map.put(JsonFieldName.CODE,HttpStatus.BAD_REQUEST.value());
+				map.put(JsonFieldName.ERROR,String.join(",",errors));
+				return map;
+			}
+			if(!dto.getNewPassword().equals(dto.getNewPassword())) {
+				map.put(JsonFieldName.CODE, HttpStatus.BAD_REQUEST.value());
+				map.put(JsonFieldName.ERROR,ErrorMessage.OLD_PASSWORD_IS_NOT_EQUAL_NEW_PASSWORD);
+				return map;
+			}
+			Optional<User> user = userRepository.findByEmail(loginUser);
+			if(user.isEmpty()) {
+				map.put(JsonFieldName.CODE,HttpStatus.NOT_FOUND.value());
+				map.put(JsonFieldName.ERROR,ErrorMessage.USER_NOT_EXIST);
+				return map;
+			}
+			if(!passwordEncoder.matches(dto.getOldPassword(),user.get().getPassword())) {
+				map.put(JsonFieldName.CODE,HttpStatus.BAD_REQUEST.value());
+				map.put(JsonFieldName.ERROR, ErrorMessage.PASSWORD_NOT_MATCH);
+				return map;
+			}
+			user.get().setPassword(PasswordUtils.encode(dto.getNewPassword()));
+			userRepository.save(user.get());
+			map.put(JsonFieldName.CODE, HttpStatus.OK.value());
+			map.put(JsonFieldName.DATA, user.get());
+			return map;
+			
+		}catch(Exception ex) {
+			map.put(JsonFieldName.CODE, HttpStatus.INTERNAL_SERVER_ERROR.value());
+			map.put(JsonFieldName.ERROR, ex.getMessage());
+			return map;
+		}
+	}
+	public Map<String,Object> me(String loginUser){
+		Map<String, Object> map = new HashMap<>();
+		try {
+			Optional<User> user= userRepository.findByEmail(loginUser);
+			if(user.isEmpty()) {
+				map.put(JsonFieldName.CODE,HttpStatus.NOT_FOUND.value());
+				map.put(JsonFieldName.ERROR,ErrorMessage.USER_NOT_EXIST);
+				return map;
+			}
+			map.put(JsonFieldName.CODE, HttpStatus.OK.value());
+			map.put(JsonFieldName.DATA, user.get());
+			return map;
+		}catch(Exception ex) {
 			map.put(JsonFieldName.CODE, HttpStatus.INTERNAL_SERVER_ERROR.value());
 			map.put(JsonFieldName.ERROR, ex.getMessage());
 			return map;
