@@ -189,6 +189,8 @@ public class TeamService {
 				map.put(JsonFieldName.ERROR,ErrorMessage.TEAM_IS_NOT_EXIST);
 				return map;
 			}
+			team.get().getUsers().clear();
+			team.get().getTasks().clear();
 			teamRepository.delete(team.get());
 			map.put(JsonFieldName.CODE,HttpStatus.OK.value());
 			map.put(JsonFieldName.DATA,ErrorMessage.SUCCESS);
