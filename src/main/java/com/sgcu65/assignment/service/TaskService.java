@@ -89,8 +89,10 @@ public class TaskService {
 			entity.setUsers(users);
 			
 			Task task = taskRepository.save(entity);
+			
+			Task ret = taskRepository.findById(task.getId()).get();
 			map.put(JsonFieldName.CODE, HttpStatus.CREATED.value());
-			map.put(JsonFieldName.DATA, task);
+			map.put(JsonFieldName.DATA, ret);
 			return map;
 		}catch(Exception ex) {
 			map.put(JsonFieldName.CODE,HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -165,8 +167,10 @@ public class TaskService {
 			}).collect(Collectors.toSet());
 			entity.setUsers(users);
 			Task task = taskRepository.save(entity);
-			map.put(JsonFieldName.CODE, HttpStatus.OK.value());
-			map.put(JsonFieldName.DATA, task);
+			Task ret = taskRepository.findById(task.getId()).get();
+			map.put(JsonFieldName.CODE,HttpStatus.OK.value());
+			map.put(JsonFieldName.DATA, ret);
+	
 			return map;
 		}catch(Exception ex) {
 			map.put(JsonFieldName.CODE,HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -196,6 +200,39 @@ public class TaskService {
 			map.put(JsonFieldName.CODE, HttpStatus.OK.value());
 			map.put(JsonFieldName.DATA, ErrorMessage.SUCCESS);
 			return map;
+		}catch(Exception ex) {
+			map.put(JsonFieldName.CODE,HttpStatus.INTERNAL_SERVER_ERROR.value());
+			map.put(JsonFieldName.ERROR, ex.getMessage());
+			return map;
+		}
+	}
+	@Transactional
+	public Map<String,Object> assignUser(Set<User> users,String id,String loginUser){
+		Map<String,Object> map = new HashMap<>();
+		try {
+			boolean isAdmin = IsAdmin(loginUser);
+			if(!isAdmin) {
+				map.put(JsonFieldName.CODE, HttpStatus.UNAUTHORIZED.value());
+				map.put(JsonFieldName.ERROR,ErrorMessage.USER_IS_UN_AUTHOIRZE);
+				return map;
+			}
+			Optional<Task> task = taskRepository.findById(UUID.fromString(id));
+			if(task.isEmpty()) {
+				map.put(JsonFieldName.CODE,HttpStatus.NOT_FOUND.value());
+				map.put(JsonFieldName.ERROR,ErrorMessage.TASK_NOT_EXIST);
+				return map;
+			}
+			Set<User> items = users.stream().map(t->{
+				User item = userRepository.findById(t.getId()).get();
+				return item;
+			}).collect(Collectors.toSet());
+			task.get().setUsers(items);
+			taskRepository.save(task.get());
+			Task ret = taskRepository.findById(UUID.fromString(id)).get();
+			map.put(JsonFieldName.CODE,HttpStatus.OK.value());
+			map.put(JsonFieldName.DATA, ret);
+			return map;
+			
 		}catch(Exception ex) {
 			map.put(JsonFieldName.CODE,HttpStatus.INTERNAL_SERVER_ERROR.value());
 			map.put(JsonFieldName.ERROR, ex.getMessage());

@@ -72,4 +72,6 @@ public class UserController {
 		Map<String, Object> map = userService.delete(id, loginUser);
 		return ResponseEntity.status((int) map.get(JsonFieldName.CODE)).body(map);
 	}
+	
+
 }

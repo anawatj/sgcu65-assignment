@@ -93,8 +93,9 @@ public class TeamService {
 			entity.setTasks(tasks);
 			entity.setUsers(users);
 			Team team = teamRepository.save(entity);
+			Team ret= teamRepository.findById(team.getId()).get();
 			map.put(JsonFieldName.CODE,HttpStatus.CREATED.value());
-			map.put(JsonFieldName.DATA,team);
+			map.put(JsonFieldName.DATA,ret);
 			return map;
 		}catch(Exception ex) {
 			map.put(JsonFieldName.CODE,HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -165,8 +166,9 @@ public class TeamService {
 			entity.setTasks(tasks);
 			entity.setUsers(users);
 			Team team = teamRepository.save(entity);
+			Team ret= teamRepository.findById(team.getId()).get();
 			map.put(JsonFieldName.CODE,HttpStatus.OK.value());
-			map.put(JsonFieldName.DATA,team);
+			map.put(JsonFieldName.DATA,ret);
 			return map;
 			
 		}catch(Exception ex) {
@@ -198,6 +200,74 @@ public class TeamService {
 			map.put(JsonFieldName.DATA,ErrorMessage.SUCCESS);
 			return map;
 			
+			
+		}catch(Exception ex) {
+			map.put(JsonFieldName.CODE,HttpStatus.INTERNAL_SERVER_ERROR.value());
+			map.put(JsonFieldName.ERROR, ex.getMessage());
+			return map;
+		}
+	}
+	
+	@Transactional
+	public Map<String,Object> assignUser(Set<User> users,String id,String loginUser){
+		Map<String,Object> map = new HashMap<>();
+		try {
+			boolean isAdmin = IsAdmin(loginUser);
+			if(!isAdmin) {
+				map.put(JsonFieldName.CODE, HttpStatus.UNAUTHORIZED.value());
+				map.put(JsonFieldName.ERROR,ErrorMessage.USER_IS_UN_AUTHOIRZE);
+				return map;
+			}
+			Optional<Team> team = teamRepository.findById(UUID.fromString(id));
+			if(team.isEmpty()) {
+				map.put(JsonFieldName.CODE, HttpStatus.NOT_FOUND.value());
+				map.put(JsonFieldName.ERROR,ErrorMessage.TEAM_IS_NOT_EXIST);
+				return map;
+			}
+			Set<User> items = users.stream().map(t->{
+				User item = userRepository.findById(t.getId()).get();
+				return item;
+			}).collect(Collectors.toSet());
+			team.get().setUsers(items);
+			teamRepository.save(team.get());
+			Team ret= teamRepository.findById(UUID.fromString(id)).get();
+			map.put(JsonFieldName.CODE,HttpStatus.OK.value());
+			map.put(JsonFieldName.DATA,ret);
+			return map;
+			
+		}catch(Exception ex) {
+			map.put(JsonFieldName.CODE,HttpStatus.INTERNAL_SERVER_ERROR.value());
+			map.put(JsonFieldName.ERROR, ex.getMessage());
+			return map;
+		}
+	}
+	
+	@Transactional
+	public Map<String,Object> assignTask(Set<Task> tasks,String id,String loginUser){
+		Map<String,Object> map = new HashMap<>();
+		try {
+			boolean isAdmin = IsAdmin(loginUser);
+			if(!isAdmin) {
+				map.put(JsonFieldName.CODE, HttpStatus.UNAUTHORIZED.value());
+				map.put(JsonFieldName.ERROR,ErrorMessage.USER_IS_UN_AUTHOIRZE);
+				return map;
+			}
+			Optional<Team> team = teamRepository.findById(UUID.fromString(id));
+			if(team.isEmpty()) {
+				map.put(JsonFieldName.CODE, HttpStatus.NOT_FOUND.value());
+				map.put(JsonFieldName.ERROR,ErrorMessage.TEAM_IS_NOT_EXIST);
+				return map;
+			}
+			Set<Task> items = tasks.stream().map(t->{
+				Task item = taskRepository.findById(t.getId()).get();
+				return item;
+			}).collect(Collectors.toSet());
+			team.get().setTasks(items);
+			teamRepository.save(team.get());
+			Team ret= teamRepository.findById(UUID.fromString(id)).get();
+			map.put(JsonFieldName.CODE,HttpStatus.OK.value());
+			map.put(JsonFieldName.DATA,ret);
+			return map;
 			
 		}catch(Exception ex) {
 			map.put(JsonFieldName.CODE,HttpStatus.INTERNAL_SERVER_ERROR.value());
