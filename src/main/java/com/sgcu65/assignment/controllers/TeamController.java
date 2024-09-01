@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sgcu65.assignment.domain.Task;
@@ -32,10 +33,10 @@ public class TeamController {
 	
 	
 	@GetMapping(value = "/api/v1/teams")
-	public ResponseEntity<Map<String,Object>> findAll(@RequestHeader("Authorization") String bearerToken){
+	public ResponseEntity<Map<String,Object>> findAll(@RequestHeader("Authorization") String bearerToken,@RequestParam(value = "name",required = false) String name){
 		final String jwt = bearerToken.substring(7);
 		String loginUser = jwtService.extractUsername(jwt);
-		Map<String,Object> map = teamService.findAll(loginUser);
+		Map<String,Object> map = teamService.findAll(name,loginUser);
 		return ResponseEntity.status((int)map.get(JsonFieldName.CODE)).body(map);
 	}
 	@PostMapping(value = "/api/v1/teams")

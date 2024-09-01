@@ -29,7 +29,16 @@ public class User extends AbstractDomain<UUID> implements UserDetails {
 	@Column(name="password")
 	private String password;
 	
+	@Column(name = "salary")
+	private Double salary;
+	
 	 
+	public Double getSalary() {
+		return salary;
+	}
+	public void setSalary(Double salary) {
+		this.salary = salary;
+	}
 	public String getPassword() {
 		return password;
 	}

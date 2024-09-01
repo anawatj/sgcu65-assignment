@@ -24,7 +24,8 @@ public class UserService {
 	@Autowired
 	private IUserRepository userRepository;
 
-	public Map<String, Object> findAll(String loginUser) {
+	public Map<String, Object> findAll(String firstName, String surName, String position, String salary,
+			String loginUser) {
 		Map<String, Object> map = new HashMap<>();
 		try {
 			boolean isAdmin = IsAdmin(loginUser);
@@ -33,8 +34,33 @@ public class UserService {
 				map.put(JsonFieldName.ERROR, ErrorMessage.USER_IS_UN_AUTHOIRZE);
 				return map;
 			}
+			if (firstName == null || firstName.isEmpty() || firstName.equals("")) {
+				firstName = "";
+			}
+			if (surName == null || surName.isEmpty() || surName.equals("")) {
+				surName = "";
+			}
+			Role role;
+			if (position == null || position.isEmpty() || position.equals("")) {
+				role = null;
+			} else {
+				role = Role.valueOf(position);
 
-			List<User> users = userRepository.findAll();
+			}
+			Double s;
+			if (salary == null || salary.isEmpty() || salary.equals("")) {
+				s=null;
+			}else {
+				try {
+					s = Double.parseDouble(salary);
+				} catch (Exception ex2) {
+					s = -1.0;
+				}
+			}
+			
+
+			List<User> users = userRepository.findAll(firstName.replace("*", "%").replace("?", "_"),
+					surName.replace("*", "%").replace("?", "_"), role, s);
 
 			if (users.size() == 0) {
 				map.put(JsonFieldName.CODE, HttpStatus.NOT_FOUND.value());

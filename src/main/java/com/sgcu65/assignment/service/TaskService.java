@@ -30,7 +30,7 @@ public class TaskService {
 	
 	@Autowired
 	private IUserRepository userRepository;
-	public Map<String,Object> findAll(String loginUser){
+	public Map<String,Object> findAll(String name,String loginUser){
 		Map<String,Object> map = new HashMap<>();
 		try {
 			boolean isAdmin = IsAdmin(loginUser);
@@ -39,7 +39,10 @@ public class TaskService {
 				map.put(JsonFieldName.ERROR,ErrorMessage.USER_IS_UN_AUTHOIRZE);
 				return map;
 			}
-			List<Task> tasks = taskRepository.findAll();
+			if(name==null || name.isEmpty() || name.equals("")) {
+				name= "";
+			}
+			List<Task> tasks = taskRepository.findAll(name.replace("*","%").replace("?", "_"));
 			if(tasks.size()==0) {
 				map.put(JsonFieldName.CODE, HttpStatus.NOT_FOUND.value());
 				map.put(JsonFieldName.ERROR,ErrorMessage.TASK_NOT_FOUND);

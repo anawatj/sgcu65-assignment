@@ -37,7 +37,7 @@ public class TeamService {
 	private ITaskRepository taskRepository;
 	
 	
-	public Map<String,Object> findAll(String loginUser){
+	public Map<String,Object> findAll(String name,String loginUser){
 		Map<String,Object> map = new HashMap<>();
 		try {
 			boolean isAdmin = IsAdmin(loginUser);
@@ -46,7 +46,10 @@ public class TeamService {
 				map.put(JsonFieldName.ERROR,ErrorMessage.USER_IS_UN_AUTHOIRZE);
 				return map;
 			}
-			List<Team> teams = teamRepository.findAll();
+			if(name==null || name.isEmpty() || name.equals("")) {
+				name = "";
+			}
+			List<Team> teams = teamRepository.findAll(name.replace("*", "%").replace("?", "_"));
 			if(teams.size()==0) {
 				map.put(JsonFieldName.CODE,HttpStatus.NOT_FOUND.value());
 				map.put(JsonFieldName.ERROR,ErrorMessage.TEAM_NOT_FOUND);

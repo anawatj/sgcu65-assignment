@@ -1,5 +1,6 @@
 package com.sgcu65.assignment.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,4 +17,8 @@ public interface ITaskRepository extends JpaRepository<Task,UUID> {
 		   " JOIN FETCH task.users users "+
 		   " WHERE task.id=:id ")
 	Optional<Task> findById(UUID id);
+	
+	@Query(" SELECT task FROM Task task "+
+		   " WHERE  task.name LIKE :name OR :name = '' ")
+	List<Task> findAll(String name);
 }

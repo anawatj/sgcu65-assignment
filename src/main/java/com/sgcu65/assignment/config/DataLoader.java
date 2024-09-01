@@ -21,7 +21,8 @@ public class DataLoader implements ApplicationRunner {
 		user.setPassword("P@ssw0rd");
 		user.setFirstName("Anawat");
 		user.setSurName("Jarusiripot");
-		user.setRole(Role.Admin);;
+		user.setRole(Role.Admin);
+		user.setSalary(55000.00);
 		userService.save(user,"SUPER");
 		
 	}

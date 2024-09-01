@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sgcu65.assignment.domain.User;
@@ -28,10 +29,14 @@ public class UserController {
 	private UserService userService;
 
 	@GetMapping(value = "/api/v1/users")
-	public ResponseEntity<Map<String, Object>> findAll(@RequestHeader("Authorization") String bearerToken) {
+	public ResponseEntity<Map<String, Object>> findAll(@RequestHeader("Authorization") String bearerToken,@RequestParam(value = "firstName",required = false) String firstName,
+			@RequestParam(value = "surName",required = false) String surName,
+			@RequestParam(value = "position",required = false) String position,
+			@RequestParam(value = "salary",required = false) String salary
+			) {
 		final String jwt = bearerToken.substring(7);
 		String loginUser = jwtService.extractUsername(jwt);
-		Map<String, Object> map = userService.findAll(loginUser);
+		Map<String, Object> map = userService.findAll(firstName,surName,position,salary,loginUser);
 		return ResponseEntity.status((int) map.get(JsonFieldName.CODE)).body(map);
 
 	}
