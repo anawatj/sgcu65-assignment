@@ -47,7 +47,9 @@ public class TeamController {
 	public ResponseEntity<Map<String, Object>> findById(@RequestHeader("Authorization") String bearerToken,
 			@PathVariable String id) {
 		final String jwt = bearerToken.substring(7);
+		System.out.println(jwt);
 		String loginUser = jwtService.extractUsername(jwt);
+		System.out.println(loginUser);
 		Map<String, Object> map = teamService.findById(id, loginUser);
 		return ResponseEntity.status((int) map.get(JsonFieldName.CODE)).body(map);
 

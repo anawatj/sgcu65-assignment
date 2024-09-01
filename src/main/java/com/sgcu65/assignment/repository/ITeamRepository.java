@@ -13,8 +13,8 @@ public interface ITeamRepository extends JpaRepository<Team, UUID> {
 
 	@Override
 	@Query("SELECT DISTINCT team FROM Team team  "+
-			   " JOIN FETCH team.users users "+
-			   " JOIN FETCH team.tasks tasks " +
-			   " WHERE team.id=:id ")
+		   " JOIN FETCH team.users users "+
+		   " JOIN FETCH team.tasks tasks " +
+		   " WHERE team.id=:id ")
 	Optional<Team> findById(UUID id);
 }

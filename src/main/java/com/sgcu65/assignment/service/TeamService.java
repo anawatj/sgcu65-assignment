@@ -119,7 +119,7 @@ public class TeamService {
 				return map;
 			}
 			map.put(JsonFieldName.CODE,HttpStatus.OK.value());
-			map.put(JsonFieldName.DATA, team);
+			map.put(JsonFieldName.DATA, team.get());
 			return map;
 		}catch(Exception ex) {
 			map.put(JsonFieldName.CODE,HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -127,6 +127,7 @@ public class TeamService {
 			return map;
 		}
 	}
+	@Transactional
 	public Map<String,Object> update(Team entity,String id,String loginUser){
 		Map<String,Object> map = new HashMap<>();
 		try {
@@ -164,7 +165,7 @@ public class TeamService {
 			entity.setTasks(tasks);
 			entity.setUsers(users);
 			Team team = teamRepository.save(entity);
-			map.put(JsonFieldName.CODE,HttpStatus.CREATED.value());
+			map.put(JsonFieldName.CODE,HttpStatus.OK.value());
 			map.put(JsonFieldName.DATA,team);
 			return map;
 			
@@ -174,6 +175,7 @@ public class TeamService {
 			return map;
 		}
 	}
+	@Transactional
 	public Map<String,Object> delete(String id,String loginUser){
 		Map<String,Object> map = new HashMap<>();
 		try {
