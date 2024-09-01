@@ -23,5 +23,7 @@ public final class ErrorMessage {
 	public static final String TEAM_NOT_FOUND ="Team Not Found";
 	
 	public static final String NAME_IS_REQUIRED = "name is required";
+	
+	public static final String TEAM_IS_NOT_EXIST = "Team is not exists";
 			
 }
