@@ -32,4 +32,6 @@ public final class ErrorMessage {
 	public static final String OLD_PASSWORD_IS_NOT_EQUAL_NEW_PASSWORD = "Old password must not equal new password";
 	
 	public static final String PASSWORD_NOT_MATCH = "Password not match";
+	
+	public static final String SALARY_IS_REQUIRED = "Salary is required";
 }

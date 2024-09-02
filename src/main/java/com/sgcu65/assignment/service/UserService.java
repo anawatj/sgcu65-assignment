@@ -95,22 +95,7 @@ public class UserService {
 				}
 			}
 
-			List<String> errors = new ArrayList<>();
-			if (entity.getEmail() == null || entity.getEmail().isEmpty()) {
-				errors.add(ErrorMessage.EMAIL_IS_REQUIRED);
-			}
-			if (entity.getFirstName() == null || entity.getFirstName().isEmpty()) {
-				errors.add(ErrorMessage.FIRST_NAME_IS_REQUIRED);
-			}
-			if (entity.getSurName() == null || entity.getSurName().isEmpty()) {
-				errors.add(ErrorMessage.SUR_NAME_IS_REQUIRED);
-			}
-			if (entity.getPassword() == null || entity.getPassword().isEmpty()) {
-				errors.add(ErrorMessage.PASSWORD_IS_REQUIRED);
-			}
-			if (entity.getRole() == null) {
-				errors.add(ErrorMessage.ROLE_IS_REQUIRED);
-			}
+			List<String> errors = validate(entity);
 			if (errors.size() > 0) {
 				map.put(JsonFieldName.CODE, HttpStatus.BAD_REQUEST.value());
 				map.put(JsonFieldName.ERROR, String.join(",", errors));
@@ -172,22 +157,7 @@ public class UserService {
 				return map;
 			}
 
-			List<String> errors = new ArrayList<>();
-			if (entity.getEmail() == null || entity.getEmail().isEmpty()) {
-				errors.add(ErrorMessage.EMAIL_IS_REQUIRED);
-			}
-			if (entity.getFirstName() == null || entity.getFirstName().isEmpty()) {
-				errors.add(ErrorMessage.FIRST_NAME_IS_REQUIRED);
-			}
-			if (entity.getSurName() == null || entity.getSurName().isEmpty()) {
-				errors.add(ErrorMessage.SUR_NAME_IS_REQUIRED);
-			}
-			if (entity.getPassword() == null || entity.getPassword().isEmpty()) {
-				errors.add(ErrorMessage.PASSWORD_IS_REQUIRED);
-			}
-			if (entity.getRole() == null) {
-				errors.add(ErrorMessage.ROLE_IS_REQUIRED);
-			}
+			List<String> errors = validate(entity);
 			if (errors.size() > 0) {
 				map.put(JsonFieldName.CODE, HttpStatus.BAD_REQUEST.value());
 				map.put(JsonFieldName.ERROR, String.join(",", errors));
@@ -312,6 +282,28 @@ public class UserService {
 			map.put(JsonFieldName.ERROR, ex.getMessage());
 			return map;
 		}
+	}
+	private List<String> validate(User entity){
+		List<String> errors = new ArrayList<>();
+		if (entity.getEmail() == null || entity.getEmail().isEmpty()) {
+			errors.add(ErrorMessage.EMAIL_IS_REQUIRED);
+		}
+		if (entity.getFirstName() == null || entity.getFirstName().isEmpty()) {
+			errors.add(ErrorMessage.FIRST_NAME_IS_REQUIRED);
+		}
+		if (entity.getSurName() == null || entity.getSurName().isEmpty()) {
+			errors.add(ErrorMessage.SUR_NAME_IS_REQUIRED);
+		}
+		if (entity.getPassword() == null || entity.getPassword().isEmpty()) {
+			errors.add(ErrorMessage.PASSWORD_IS_REQUIRED);
+		}
+		if(entity.getSalary()==null) {
+			errors.add(ErrorMessage.SALARY_IS_REQUIRED);
+		}
+		if (entity.getRole() == null) {
+			errors.add(ErrorMessage.ROLE_IS_REQUIRED);
+		}
+		return errors;
 	}
 
 	private boolean IsAdmin(String loginUser) {

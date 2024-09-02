@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sgcu65.assignment.domain.Action;
 import com.sgcu65.assignment.domain.Role;
 import com.sgcu65.assignment.domain.Task;
 import com.sgcu65.assignment.domain.TaskStatus;
@@ -67,16 +68,7 @@ public class TaskService {
 				map.put(JsonFieldName.ERROR,ErrorMessage.USER_IS_UN_AUTHOIRZE);
 				return map;
 			}
-			List<String> errors = new ArrayList<>();
-			if(entity.getName().isEmpty() || entity.getName().equals("")) {
-				errors.add(ErrorMessage.TASK_NAME_IS_REQUIRED);
-			}
-			if(entity.getContent().isEmpty() || entity.getContent().equals("")) {
-				errors.add(ErrorMessage.TASK_CONTENT_IS_REQUIRED);
-			}
-			if(entity.getDeadline()==null) {
-				errors.add(ErrorMessage.TASK_CONTENT_IS_REQUIRED);
-			}
+			List<String> errors = validate(entity,Action.CREATE);
 			if(errors.size()>0) {
 				map.put(JsonFieldName.CODE,HttpStatus.BAD_REQUEST.value());
 				map.put(JsonFieldName.ERROR,String.join(",",errors));
@@ -139,19 +131,7 @@ public class TaskService {
 				return map;
 			}
 			
-			List<String> errors = new ArrayList<>();
-			if(entity.getName().isEmpty() || entity.getName().equals("")) {
-				errors.add(ErrorMessage.TASK_NAME_IS_REQUIRED);
-			}
-			if(entity.getContent().isEmpty() || entity.getContent().equals("")) {
-				errors.add(ErrorMessage.TASK_CONTENT_IS_REQUIRED);
-			}
-			if(entity.getDeadline()==null) {
-				errors.add(ErrorMessage.TASK_CONTENT_IS_REQUIRED);
-			}
-			if(entity.getTaskStatus()==null) {
-				errors.add(ErrorMessage.TASK_STATUS_IS_REQUIRED);
-			}
+			List<String> errors = validate(entity,Action.UPDATE);
 			if(errors.size()>0) {
 				map.put(JsonFieldName.CODE,HttpStatus.BAD_REQUEST.value());
 				map.put(JsonFieldName.ERROR,String.join(",",errors));
@@ -241,6 +221,25 @@ public class TaskService {
 			map.put(JsonFieldName.ERROR, ex.getMessage());
 			return map;
 		}
+	}
+	private List<String> validate(Task entity,Action action){
+		List<String> errors = new ArrayList<>();
+		if(entity.getName().isEmpty() || entity.getName().equals("")) {
+			errors.add(ErrorMessage.TASK_NAME_IS_REQUIRED);
+		}
+		if(entity.getContent().isEmpty() || entity.getContent().equals("")) {
+			errors.add(ErrorMessage.TASK_CONTENT_IS_REQUIRED);
+		}
+		if(entity.getDeadline()==null) {
+			errors.add(ErrorMessage.TASK_CONTENT_IS_REQUIRED);
+		}
+		if(action==Action.UPDATE) {
+			if(entity.getTaskStatus()==null) {
+				errors.add(ErrorMessage.TASK_STATUS_IS_REQUIRED);
+			}
+		}
+		
+		return errors;
 	}
 	private boolean IsAdmin(String loginUser) {
 		Optional<User> loginData = userRepository.findByEmail(loginUser);

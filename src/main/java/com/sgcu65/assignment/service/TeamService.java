@@ -141,10 +141,7 @@ public class TeamService {
 				map.put(JsonFieldName.ERROR,ErrorMessage.USER_IS_UN_AUTHOIRZE);
 				return map;
 			}
-			List<String> errors = new ArrayList<>();
-			if(entity.getName().isEmpty() || entity.getName().equals("")) {
-				errors.add(ErrorMessage.NAME_IS_REQUIRED);
-			}
+			List<String> errors = validate(entity);
 			if(errors.size()>0) {
 				map.put(JsonFieldName.CODE, HttpStatus.BAD_REQUEST.value());
 				map.put(JsonFieldName.ERROR,String.join(",",errors));
@@ -277,6 +274,14 @@ public class TeamService {
 			map.put(JsonFieldName.ERROR, ex.getMessage());
 			return map;
 		}
+	}
+	
+	private List<String> validate(Team entity){
+		List<String> errors = new ArrayList<>();
+		if(entity.getName().isEmpty() || entity.getName().equals("")) {
+			errors.add(ErrorMessage.NAME_IS_REQUIRED);
+		}
+		return errors;
 	}
 	
 	private boolean IsAdmin(String loginUser) {
